@@ -16,17 +16,25 @@
         </div>
       </div>
         <div class="box" v-if="menu==='goal'">
+        <div class="white--text" v-if="!items.length">          
+          <h3 class="mt-10"> "Imagination becomes a reality." </h3> 
+          <h3> "Dream vividly and it will come true." </h3>
+          <h3> "If you dream desperately, it will come true."</h3>
+          <h3 class="mt-10"> "상상은 현실이 된다." </h3> 
+          <h3> "간절히 꿈꾸면 이루어진다." </h3>
+          <h3>  "생생하게 꿈꾸면 이루어진다." </h3>
+        </div>
           <div v-for="(n,i) in items" :key="i" class="item color" :class="n.class+i" @click="select(n,i)"
             :style="`background: linear-gradient(45deg, ${n.color1} 0%, ${n.color2} 100%)`" >
             <!-- :style="`background: linear-gradient(45deg, ${colors[Math.floor(Math.random() * colors.length)]} 0%, ${colors[Math.floor(Math.random() * colors.length)]} 100%)`" > -->
-            <div class="d-flex">
               <h2 >{{n.title}}</h2> <v-spacer></v-spacer>
-              <h4>{{ n.Dday }}</h4>
-            </div>
             <v-rating :value="n.star" small color="var(--main-color)" hover readonly ></v-rating>
             <v-progress-linear color="var(--main-color)" dark class="mt-8" height="15" style="border-radius: 10px;" :value="filter(n)" >
               {{ filter(n)}}%
             </v-progress-linear>
+            <div class="d-flex">
+              <v-spacer></v-spacer> <h4>{{ n.Dday }}</h4>
+            </div>
           </div> 
         </div>
         <div class="box2" v-else> 
@@ -126,6 +134,8 @@ export default {
 
   data() {
       return {
+          version: '20230125',
+          loaded:false,
           year: new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().substring(0,4),
           today: new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().substring(0, 10),
           Rules: [(v) => !!v || "필수입력란"],
@@ -154,10 +164,31 @@ export default {
   },
 
   mounted() {
+  this.getV(),
   this.getItems()  
   },
 
   methods: {
+    async getV () {
+      fetch('https://mrcau.github.io/version/version.json')
+      .then(response=>response.json())
+      .then(json=>{
+        if (json.version !== this.version) {this.reload()}
+      }).catch(error=>{console.log(error);});
+      },
+
+    async reload () {
+      caches
+        .keys()
+        .then(c => {
+          for (const i of c) {
+            caches.delete(i)
+          }
+        })
+        .then(() => {
+          location.reload(true)
+        })
+    },
     imgError(e){
       this.img = false;
       e.target.src =require('@/assets/errorimg.png')
@@ -300,7 +331,7 @@ export default {
 }
 #app{
   background-image: url;
-  background-color: var(--main-color);
+  background-color:  #424242;
   font-style: italic;
   font-family: 'Stardos Stencil','Dongle',sans-serif;;
   -webkit-font-smoothing: antialiased;
