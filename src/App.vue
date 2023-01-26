@@ -90,14 +90,14 @@
       </v-dialog>
 
       <v-dialog v-model="dialog2"  max-width="500px" height="300px" style="position: relative;" >
-          <v-card color="secondary" class="pb-5" v-if="google"  >
+          <v-card color="secondary"  v-if="google"  >
               <v-form ref="form2" lazy-validation>
-                <v-rating v-model="item.star" color="var(--main-color)" hover ></v-rating>
+                <v-rating v-model="item.star" color="var(--main-color)" hover  v-if="!edit"></v-rating>
                 <v-btn dark dense icon style="padding: 0;position: absolute;top:0;right:0" 
                 v-if="edit" @click="remove">
                       <span class="mdi mdi-delete" style="font-size: 25px;"></span>
                 </v-btn> 
-                <v-card-title class=" white--text mx-5 pt-3 d-flex" style="padding:0;" v-if="!item.title">
+                <v-card-title class=" white--text mx-5 py-5 d-flex" style="padding:0;" v-if="!item.title">
                  <v-text-field v-model="item.keyword" label="KeyWord" :rules="Rules" required dark  dense color="var(--main-color)"
                     placeholder="이미지 키워드를 입력해주세요." class="mt-3 mr-3" style=" font-style: normal" ></v-text-field>
                   <v-btn dark color="var(--main-color)" small :loading="loading" @click="serch()"  > <h3>SERCH</h3> </v-btn>
@@ -106,7 +106,7 @@
                  <img class="img" v-if="item.title"  :src="item.title" @error="imgError"  /> 
                  <div v-else>                 
                   <div v-for="(n,i) in serchItems" :key="i" style="display:inline-block">
-                        <img  style="width:100px ;height:100px"  :src="n.link"  @error="googleError" @click="save(n)" />                  
+                        <img  style="width:100px ;height:100px"  :src="n.image.thumbnailLink"  @error="googleError" @click="save(n)" />                  
                   </div>
                 </div>
               </v-form>
@@ -424,8 +424,18 @@ footer{
   overflow-y: auto;
   overflow-x: hidden;
   display: grid;
-  grid-template-columns: repeat(auto-fit,minmax(300px,1fr));
+  grid-template-columns: 1fr 1fr;
   grid-auto-rows: 180px;
+}
+@media (min-width: 600px) {
+  .box2{
+  grid-template-columns: 1fr 1fr 1fr;
+  }
+}
+@media (min-width: 1024px) {
+  .box2{
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  }
 }
 .item {
   color: rgba(255,255,255,.9);
