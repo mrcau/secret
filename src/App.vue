@@ -4,7 +4,7 @@
       <div class="top mb-3">
         <v-img src="@/assets/secret.png" width="20%" max-width="200px" style="position: absolute;top:10px;left:10px;z-index: 10;"></v-img>
         <h1 class="white--text mt-5">{{ year }}</h1>
-        <h1 class="white--text">SECRET NOTE</h1> 
+        <h1 class="white--text">SECRET TODO</h1> 
           <v-btn-toggle v-model="menu" color="white" mandatory dark group class="d-flex mb-3" >
             <v-btn dark  value="goal" @click="menuToggle('goal')" style="width:50%">   <h2>Goal</h2>  </v-btn> 
             <v-btn dark  value="vision" @click="menuToggle('vision')" style="width:50%"> <h2>Vision</h2> </v-btn> 
@@ -49,7 +49,7 @@
       <v-dialog v-model="dialog"  max-width="500px" style="position: relative;" >
           <v-card color="secondary"   >
               <v-form ref="form1" lazy-validation>
-                <v-rating v-model="item.star" color="var(--main-color)" hover @click="hihi"></v-rating>
+                <v-rating v-model="item.star" color="var(--main-color)" hover ></v-rating>
                 <v-btn dark dense icon style="padding: 0;position: absolute;top:0;right:0" @click="remove" v-if="edit" >
                       <span class="mdi mdi-delete" style="font-size: 25px;"></span>
                 </v-btn> 
@@ -89,10 +89,32 @@
             </v-card>
       </v-dialog>
 
-      <v-dialog v-model="dialog2"  max-width="500px" style="position: relative;" >
-          <v-card color="secondary"   >
+      <v-dialog v-model="dialog2"  max-width="500px" height="300px" style="position: relative;" >
+          <v-card color="secondary" class="pb-5" v-if="google"  >
               <v-form ref="form2" lazy-validation>
-                <v-rating v-model="item.star" color="var(--main-color)" hover @click="hihi"></v-rating>
+                <v-rating v-model="item.star" color="var(--main-color)" hover ></v-rating>
+                <v-btn dark dense icon style="padding: 0;position: absolute;top:0;right:0" 
+                v-if="edit" @click="remove">
+                      <span class="mdi mdi-delete" style="font-size: 25px;"></span>
+                </v-btn> 
+                <v-card-title class=" white--text mx-5 pt-3 d-flex" style="padding:0;" v-if="!item.title">
+                 <v-text-field v-model="item.keyword" label="KeyWord" :rules="Rules" required dark  dense color="var(--main-color)"
+                    placeholder="이미지 키워드를 입력해주세요." class="mt-3 mr-3" style=" font-style: normal" ></v-text-field>
+                  <v-btn dark color="var(--main-color)" small :loading="loading" @click="serch()"  > <h3>SERCH</h3> </v-btn>
+                </v-card-title>                   
+                 <!-- <v-img class="img" v-for="(n,i) in items" :key="i" :src="n.title" @click="select(n,i)"  /> -->
+                 <img class="img" v-if="item.title"  :src="item.title" @error="imgError"  /> 
+                 <div v-else>                 
+                  <div v-for="(n,i) in serchItems" :key="i" style="display:inline-block">
+                        <img  style="width:100px ;height:100px"  :src="n.link"  @error="googleError" @click="save(n)" />                  
+                  </div>
+                </div>
+              </v-form>
+            </v-card>
+
+            <!-- <v-card color="secondary" v-else  >
+              <v-form ref="form2" lazy-validation>
+                <v-rating v-model="item.star" color="var(--main-color)" hover ></v-rating>
                 <v-btn dark dense icon style="padding: 0;position: absolute;top:0;right:0" 
                 v-if="edit" @click="remove">
                       <span class="mdi mdi-delete" style="font-size: 25px;"></span>
@@ -101,25 +123,20 @@
                  <v-text-field v-model="item.title" label="IMAGE LINK" :rules="Rules" required dark  dense color="var(--main-color)"
                     placeholder="이미지 링크를 입력해주세요." class="mt-3" style=" font-style: normal" ></v-text-field>
                 </v-card-title> 
-
-
                   
-                <div class="text-center">
+                <div class="text-center"> -->
                     <!-- <v-file-input accept="image/*" label="사진" id="imginput" @change="addPic" style="display: none" /> -->
                     <!-- <label for="imginput">                     -->
-                      <img style="width:100% ;height:300px" v-if="item.title"  :src="item.title" @error="imgError"  />                  
-                      <img style="width:100% ;height:300px" v-else  :src="require('@/assets/img.jpg')"   />                  
+                      <!-- <img style="width:100% ;height:300px" v-if="item.title"  :src="item.title" @error="imgError"  />                  
+                      <img style="width:100% ;height:300px" v-else  :src="require('@/assets/img.jpg')"   />                   -->
                     <!-- </label> -->
-                </div>
-
-
-
-                <!-- 제출버튼 -->
+                <!-- </div>
                 <v-card-actions  >
                   <v-btn rounded class="mb-2 white--text" block color="var(--main-color)"  :loading="loading" @click="save()" > <h2>SAVE</h2> </v-btn>
                 </v-card-actions>
               </v-form>
-            </v-card>
+            </v-card> -->
+
       </v-dialog>
 
       
@@ -134,7 +151,7 @@ export default {
 
   data() {
       return {
-          version: '20230125',
+          version: '20230126',
           loaded:false,
           year: new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().substring(0,4),
           today: new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().substring(0, 10),
@@ -160,6 +177,9 @@ export default {
            img:true,
            file:'',
            imgUrl:'',
+           googleapis:'',
+           google:true,
+           serchItems:[]
       };
   },
 
@@ -173,6 +193,7 @@ export default {
       fetch('https://mrcau.github.io/version/version.json')
       .then(response=>response.json())
       .then(json=>{
+        this.googleapis = json.googleapis
         if (json.version !== this.version) {this.reload()}
       }).catch(error=>{console.log(error);});
       },
@@ -193,6 +214,10 @@ export default {
       this.img = false;
       e.target.src =require('@/assets/errorimg.png')
     },  
+    googleError(e){
+      e.target.style = 'display:none'
+      // e.target.src =require('@/assets/errorimg.png')
+    },  
     async addPic(e) { 
       this.file = e; 
       const url = URL.createObjectURL(e);
@@ -207,6 +232,7 @@ export default {
       }
     },  
       addList(){ 
+          this.serchItems = []
         if(this.menu==='goal'){
           this.dialog=true
           this.edit=false;
@@ -220,9 +246,10 @@ export default {
           }
         }else{
           this.dialog2=true;
+          this.keyword='';
           this.edit=false;
           this.item ={
-              title:'https://images.unsplash.com/photo-1562596133-06ae520e8c7e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1471&q=80', 
+              title:'', 
               contents:[{tf:false,name:'실천사항'},{tf:false,name:'실천사항'}], 
               Dday:this.today,class:'item',star:4,progress:50,
               color1:this.colors[Math.floor(Math.random() * this.colors.length)],
@@ -256,10 +283,9 @@ export default {
         }else{
           this.dialog2=true;
         }
-        console.log(n,this.star)
       },
       // deleteAll(){ localStorage.removeItem('samtodoItems');  this.getItems()  },
-      save(){ 
+      save(n){ 
         if(this.edit){
           this.items[this.index]=this.item
           if(this.menu==='goal'){
@@ -293,15 +319,26 @@ export default {
             if (!valid||!this.img) {
               return;
             }
+            this.item.title = n.link
           this.items.unshift(this.item)
             localStorage.setItem('visionItems',[JSON.stringify(this.items)])
           }
         }
           this.dialog=false;
           this.dialog2=false;
+          this.serchItems = []
+      },
+      serch(){
+        this.serchItems = []
+        this.loading = true
+        fetch(
+          `${this.googleapis+this.item.keyword}`
+            ).then((response) => response.json()).then((data) => {
+            this.serchItems = data.items
+            this.loading=false
+          }).catch((e)=>{console.log(e)});
       },
       remove(){
-          console.log(this.items)
         this.items.splice(this.index,1)
           if(this.menu==='goal'){
           localStorage.removeItem('samtodoItems');
@@ -315,10 +352,7 @@ export default {
       },
       removeItem(i){
         this.item.contents.splice(i,1) 
-      },
-      hihi(n){
-        console.log(n,'hi')
-      }
+      }, 
       
   },
 };
