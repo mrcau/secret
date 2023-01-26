@@ -71,7 +71,7 @@
                       <!-- 체크박스 -->
                       <v-checkbox v-model="item.contents[i].tf" color="red darken-3" dark style="transform:translateY(-10px);" />
                       <!-- 세부내용 -->
-                        <v-text-field v-model="item.contents[i].name" label="TODO" :disabled="item.contents[i].tf" 
+                        <v-text-field v-model="item.contents[i].name" label="TODO" :disabled="item.contents[i].tf" placeholder="실천사항을 입력해 주세요."
                         :rules="Rules" required dark filled outlined dense color="var(--main-color)"
                         style="padding: 0; margin: 0; font-style: normal" ></v-text-field>
                       <!-- 세부삭제 -->
@@ -239,7 +239,7 @@ export default {
           this.title=''
           this.item ={
               title:'', 
-              contents:[{tf:false,name:'실천사항'},{tf:false,name:'실천사항'}], 
+              contents:[{tf:false,name:''},{tf:false,name:''}], 
               Dday:this.today,class:'item',star:4,progress:50,
               color1:this.colors[Math.floor(Math.random() * this.colors.length)],
               color2:this.colors[Math.floor(Math.random() * this.colors.length)]
