@@ -57,13 +57,17 @@
       <!-- <v-btn color="primary" fab @click="deleteAll" ><v-icon>mdi-minus</v-icon></v-btn> --> 
       <v-dialog v-model="dialog" persistent max-width="500px" style="position: relative;" >
           <v-card color="secondary"   >
-              <v-btn dark text icon small style="position: absolute; top:1px; right: 1px;" @click="dialog=false" >
-                <span class="mdi mdi-close"></span> </v-btn>
+            <v-card-title style="padding: 0;margin: 0;" >
+              <v-btn dark  icon smallv-if="edit" @click="remove" v-if="edit">
+                <span class="mdi mdi-delete" style="font-size:large;"></span>
+              </v-btn> 
+              <v-spacer></v-spacer>
+              <v-btn dark  icon small @click="dialog=false" >
+                <span class="mdi mdi-close" style="font-size:large;"></span> 
+              </v-btn>
+            </v-card-title> 
               <v-form ref="form1" lazy-validation>
-                <v-rating v-model="item.star" color="var(--main-color)" hover ></v-rating>
-                <v-btn dark dense icon style="padding: 0;position: absolute;top:0;left:0" @click="remove" v-if="edit" >
-                      <span class="mdi mdi-delete" style="font-size: 25px;"></span>
-                </v-btn> 
+                <v-rating v-model="item.star" color="var(--main-color)" hover ></v-rating> 
                 <v-card-title class="text-h5 white--text mx-5 pt-3" style="padding:0;">
                   <!-- <h4>{{ title }} </h4>  -->
                   <v-text-field v-model="title" label="GOAL" :rules="Rules" required dark  dense color="var(--main-color)"
@@ -111,11 +115,9 @@
                 <span class="mdi mdi-close" style="font-size:large;"></span> 
               </v-btn>
             </v-card-title>
-                 <!-- <v-img class="img" v-for="(n,i) in items" :key="i" :src="n.title" @click="select(n,i)"  /> -->
                  <img class="img" v-if="edit"  :src="item.title" @error="imgError"  /> 
                  <div  class="imgBox"  v-else>                 
-                      <v-img class="img" v-for="(n,i) in serchItems" :key="i" :src="n.image.thumbnailLink"  @error="googleError" @click="save(n)"  />
-                        <!-- <img  style="width:100px ;height:100px"  :src="n.image.thumbnailLink"  @error="googleError" @click="save(n)" />                   -->
+                  <v-img class="img" v-for="(n,i) in serchItems" :key="i" :src="n.image.thumbnailLink"  @error="googleError" @click="saveSerch(n)"  />
                 </div>
             </v-card>
 
@@ -245,7 +247,6 @@ export default {
     },  
       addList(){ 
           this.serchItems = []
-        if(this.menu==='goal'){
           this.dialog=true
           this.edit=false;
           this.title=''
@@ -256,18 +257,6 @@ export default {
               color1:this.colors[Math.floor(Math.random() * this.colors.length)],
               color2:this.colors[Math.floor(Math.random() * this.colors.length)]
           }
-        }else{
-          this.dialog2=true;
-          this.keyword='';
-          this.edit=false;
-          this.item ={
-              title:'', 
-              contents:[{tf:false,name:'실천사항'},{tf:false,name:'실천사항'}], 
-              Dday:this.today,class:'item',star:4,progress:50,
-              color1:this.colors[Math.floor(Math.random() * this.colors.length)],
-              color2:this.colors[Math.floor(Math.random() * this.colors.length)]
-          }
-        }
       },
       addItemList(){
         this.item.contents.unshift({tf:false,name:'실천사항'})
@@ -298,28 +287,17 @@ export default {
       },
       // deleteAll(){ localStorage.removeItem('samtodoItems');  this.getItems()  },
 
-      save(n){  
+      save(){  
         if(this.edit){
           this.items[this.index]=this.item
-          if(this.menu==='goal'){
             const valid = this.$refs.form1.validate();
             if (!valid) {
               return;
             }
             this.item.title = this.title
           localStorage.removeItem('samtodoItems');
-          localStorage.setItem('samtodoItems',[JSON.stringify(this.items)])
-          }else{
-            const valid = this.$refs.form2.validate();
-            if (!valid) {
-              return;
-            }
-          localStorage.removeItem('visionItems');
-          localStorage.setItem('visionItems',[JSON.stringify(this.items)])
-          }
+          localStorage.setItem('samtodoItems',[JSON.stringify(this.items)]) 
         }else{
-          
-          if(this.menu==='goal'){
             const valid = this.$refs.form1.validate();
             if (!valid) {
               return;
@@ -327,21 +305,30 @@ export default {
           this.items.unshift(this.item)
             this.item.title = this.title
             localStorage.setItem('samtodoItems',[JSON.stringify(this.items)])
-          }else{
-            const valid = this.$refs.form2.validate();
-            if (!valid||!this.img) {
+        }
+          this.dialog=false; 
+      },
+      saveSerch(n){
+        if(this.edit){
+          const valid = this.$refs.form2.validate();
+            if (!valid) {
               return;
             }
-            this.item.title = n.link
-          this.items.unshift(this.item)
-            localStorage.setItem('visionItems',[JSON.stringify(this.items)])
-          }
+          localStorage.removeItem('visionItems');
+          localStorage.setItem('visionItems',[JSON.stringify(this.items)])
         }
-          this.dialog=false;
+        else{
+          console.log(n,this.items,this.item)
+            this.item.title = n.link
+            this.items.unshift(this.item)
+            localStorage.setItem('visionItems',[JSON.stringify(this.items)])
+            this.item={keyword:'',title:''}
+        }
           this.dialog2=false;
           this.serchItems = []
       },
       serch(){
+        console.log(this.item)
         if(!this.item.keyword){return}
         this.dialog2=true;
         this.edit = false;
