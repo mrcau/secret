@@ -46,8 +46,10 @@
         © Kms-Builder
       </footer>
       <!-- <v-btn color="primary" fab @click="deleteAll" ><v-icon>mdi-minus</v-icon></v-btn> --> 
-      <v-dialog v-model="dialog"  max-width="500px" style="position: relative;" >
+      <v-dialog v-model="dialog" persistent max-width="500px" style="position: relative;" >
           <v-card color="secondary"   >
+              <v-btn dark text icon small style="position: absolute; top:1px; right: 1px;" @click="dialog=false" >
+                <span class="mdi mdi-close"></span> </v-btn>
               <v-form ref="form1" lazy-validation>
                 <v-rating v-model="item.star" color="var(--main-color)" hover @click="hihi"></v-rating>
                 <v-btn dark dense icon style="padding: 0;position: absolute;top:0;right:0" @click="remove" v-if="edit" >
@@ -89,8 +91,10 @@
             </v-card>
       </v-dialog>
 
-      <v-dialog v-model="dialog2"  max-width="500px" style="position: relative;" >
+      <v-dialog v-model="dialog2" persistent max-width="500px" style="position: relative;" >
           <v-card color="secondary"   >
+              <v-btn dark text icon small style="position: absolute; top:1px; right: 1px;" @click="dialog2=false" >
+                <span class="mdi mdi-close"></span> </v-btn>
               <v-form ref="form2" lazy-validation>
                 <v-rating v-model="item.star" color="var(--main-color)" hover @click="hihi"></v-rating>
                 <v-btn dark dense icon style="padding: 0;position: absolute;top:0;right:0" 
@@ -134,7 +138,7 @@ export default {
 
   data() {
       return {
-          version: '20230125',
+          version: '20230131',
           loaded:false,
           year: new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().substring(0,4),
           today: new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().substring(0, 10),
