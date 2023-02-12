@@ -2,7 +2,7 @@
   <v-app> 
     <div class="mainBox">
       <div class="top mb-3">
-        <v-img src="@/assets/secret.png" width="20%" max-width="200px" style="position: absolute;top:10px;left:10px;z-index: 10;"></v-img>
+        <!-- <v-img src="@/assets/secret.png" width="20%" max-width="200px" style="position: absolute;top:10px;left:10px;z-index: 10;"></v-img> -->
         <h1 class="white--text mt-5">{{ year }}</h1>
         <h1 class="white--text">SECRET TODO</h1> 
           <v-btn-toggle v-model="menu" color="white" mandatory dark group class="d-flex mb-3" >
@@ -16,18 +16,15 @@
 
         </div>
       </div>
-        <div class="box" v-if="menu==='goal'">
+      <div class="box" v-if="menu==='goal'">
         <div class="white--text" v-if="!items.length">          
-          <h3 class="mt-10"> "Imagination becomes a reality." </h3> 
-          <h3> "Dream vividly and it will come true." </h3>
-          <h3> "If you dream desperately, it will come true."</h3>
-          <h3 class="mt-10"> "상상은 현실이 된다." </h3> 
-          <h3> "간절히 꿈꾸면 이루어진다." </h3>
-          <h3>  "생생하게 꿈꾸면 이루어진다." </h3>
+          <h2 class="mt-10"> "Imagination becomes a reality." </h2> 
+          <h2> "Dream vividly and it will come true." </h2>
+          <h2 class="mt-10"> "상상은 현실이 된다." </h2> 
+          <h2> "간절히 꿈꾸면 이루어진다." </h2>
         </div>
           <div v-for="(n,i) in items" :key="i" class="item color" :class="n.class+i" @click="select(n,i)"
             :style="`background: linear-gradient(45deg, ${n.color1} 0%, ${n.color2} 100%)`" >
-            <!-- :style="`background: linear-gradient(45deg, ${colors[Math.floor(Math.random() * colors.length)]} 0%, ${colors[Math.floor(Math.random() * colors.length)]} 100%)`" > -->
               <h2 >{{n.title}}</h2> <v-spacer></v-spacer>
             <v-rating :value="n.star" small color="var(--main-color)" hover readonly ></v-rating>
             <v-progress-linear color="var(--main-color)" dark class="mt-8" height="15" style="border-radius: 10px;" :value="filter(n)" >
@@ -37,8 +34,8 @@
               <v-spacer></v-spacer> <h4>{{ n.Dday }}</h4>
             </div>
           </div> 
-        </div>
-        <div v-else>
+       </div>
+       <div v-else>
           <v-form ref="form2" lazy-validation class="d-flex px-3 mb-3">
              <v-text-field v-model="item.keyword"   :rules="Rules" required dark  
              dense color="var(--main-color)"
@@ -48,11 +45,16 @@
           <div class="box2" > 
             <v-img class="img" v-for="(n,i) in items" :key="i" :src="n.title" @click="select(n,i)"  />
           </div>
-        </div>
+          <div class="white--text" v-if="!items.length">          
+              <h2 class="mt-10"> "Imagination becomes a reality." </h2> 
+              <h2> "If you dream desperately, it will come true."</h2>
+              <h2 class="mt-10"> "상상은 현실이 된다." </h2> 
+              <h2>  "생생하게 꿈꾸면 이루어진다." </h2>
+          </div>
+      </div>
           
-      <footer  style=" color:white">
-      <!-- <footer  style="position: fixed;bottom: 0;left: 50%;transform: translateX(-50%);color:white"> -->
-        © Kms-Builder
+      <footer  style="position:absolute;bottom:0;left:50%;transform:translateX(-50%); color:white">
+        ©  2023 Kim-Builder  <span class="mdi mdi-flip-h mdi-arm-flex white--text"></span>  
       </footer>
       <!-- <v-btn color="primary" fab @click="deleteAll" ><v-icon>mdi-minus</v-icon></v-btn> --> 
       <v-dialog v-model="dialog" persistent max-width="500px" style="position: relative;" >
@@ -160,7 +162,6 @@ export default {
 
   data() {
       return {
-          version: '20230130',
           loaded:false,
           year: new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().substring(0,4),
           today: new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().substring(0, 10),
@@ -188,6 +189,7 @@ export default {
            imgUrl:'',
            googleapis:'',
            google:true,
+          version: '20230130',
            serchItems:[]
       };
   },
@@ -208,7 +210,7 @@ export default {
       .then(response=>response.json())
       .then(json=>{
         this.googleapis = json.googleapis
-        if (json.version !== this.version) {this.reload()}
+        if (json.secret !== this.version) {this.reload()}
       }).catch(error=>{console.log(error);});
       },
 
@@ -263,6 +265,7 @@ export default {
       },
       getItems(){
          const items = JSON.parse( localStorage.getItem('samtodoItems'))||[]
+         console.log(items,localStorage)
          this.items = items.sort((a,b)=>{return b.star-a.star})
       },
       getVisions(){
@@ -328,7 +331,6 @@ export default {
           this.serchItems = []
       },
       serch(){
-        console.log(this.item)
         if(!this.item.keyword){return}
         this.dialog2=true;
         this.edit = false;
